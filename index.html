@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lookism Verse | SPEED</title>
+    <style>
+        :root {
+            --bg-dark: #050508;
+            --allied-blue: #00d2ff;
+            --lookism-red: #ff003c;
+            --grid-color: rgba(255, 255, 255, 0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Impact', sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(135deg, #0a1a2f 0%, #050508 50%, #1a0a2f 100%);
+            color: white; min-height: 100vh; display: flex; justify-content: center; align-items: center;
+            position: relative; overflow-x: hidden;
+        }
+
+        body::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 30px 30px; z-index: 0;
+        }
+
+        .container { position: relative; z-index: 1; width: 95%; max-width: 800px; text-align: center; }
+
+        /* --- ORIGINAL STYLING (RESTORED) --- */
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.95); border: 2px solid white;
+            padding: 30px; box-shadow: 8px 8px 0px var(--allied-blue);
+            transform: skew(-1deg); margin-bottom: 20px;
+        }
+
+        .logo-box img { width: 100%; max-width: 420px; margin-bottom: 20px; filter: drop-shadow(0 0 10px white); }
+        
+        input {
+            width: 100%; padding: 15px; background: #111; border: 2px solid var(--allied-blue);
+            color: white; font-size: 1.2rem; text-align: center; margin-bottom: 20px; outline: none;
+        }
+
+        .btn {
+            background: white; color: black; padding: 15px 30px; border: none;
+            font-weight: bold; font-size: 1.2rem; cursor: pointer; width: 100%; 
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .btn:hover { background: var(--allied-blue); color: white; box-shadow: 0 0 25px var(--allied-blue); }
+
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
+        .char-card {
+            background: #111; border: 2px solid #333; cursor: pointer; transition: 0.4s;
+            position: relative; overflow: hidden; height: 220px;
+        }
+        .char-card:hover { border-color: var(--allied-blue); transform: translateY(-10px); }
+        .char-card img { width: 100%; height: 100%; object-fit: cover; }
+        .char-card p { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.85); font-size: 0.9rem; padding: 10px 0; border-top: 1px solid var(--allied-blue); }
+
+        /* --- NEW GAME ELEMENTS --- */
+        .big-text { font-size: 5rem; color: var(--allied-blue); text-shadow: 0 0 30px var(--allied-blue); margin: 20px 0; }
+        
+        .wall-target { width: 180px; height: 180px; background: #333; margin: 20px auto; border: 4px solid #555; display: flex; align-items: center; justify-content: center; font-size: 3rem; cursor: pointer; transition: transform 0.05s; }
+        .wall-target:active { transform: scale(0.9); }
+
+        #dodge-box { width: 100%; height: 150px; border: 2px dashed var(--lookism-red); margin: 20px 0; display: flex; align-items: center; justify-content: center; background: #000; position: relative; }
+        #attack-flash { position: absolute; width: 100%; height: 100%; background: var(--lookism-red); display: none; opacity: 0.6; }
+        #attack-text { font-size: 2.5rem; color: white; display: none; z-index: 2; animation: blink 0.2s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* ID Card Styling */
+        #crew-id-card {
+            width: 320px; height: 500px; margin: 0 auto; border: 6px solid white;
+            position: relative; overflow: hidden; background-size: cover; background-position: center;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            box-shadow: 0 0 50px rgba(0,210,255,0.5); background-color: #000;
+        }
+        #crew-id-card::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, black 45%, transparent 80%); z-index: 1; }
+        .id-info { position: relative; z-index: 2; padding: 20px; text-align: left; }
+        .bar-bg { width: 100%; height: 5px; background: rgba(255,255,255,0.2); margin-bottom: 10px; }
+        .bar-fill { height: 100%; background: var(--allied-blue); width: 0%; transition: width 1s ease-out; }
+        
+        #op-message { color: var(--lookism-red); font-weight: 900; font-size: 1.3rem; text-align: center; display: none; }
+
+        .credits-footer { position: fixed; bottom: 10px; right: 15px; font-size: 0.55rem; color: rgba(255,255,255,0.3); pointer-events: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="page1" class="glass-panel">
+            <div class="logo-box"><img src="https://static.wikia.nocookie.net/lookism/images/1/1e/Wordmark-large.png/revision/latest?cb=20180225150722"></div>
+            <h1>SPEED IDENTITY</h1>
+            <input type="text" id="nameInput" placeholder="ENTER YOUR NAME...">
+            <button class="btn" onclick="goToWelcome()">Confirm 👊</button>
+        </div>
+
+        <div id="page2" class="glass-panel hidden">
+            <h1 id="welcomeTitle">WELCOME</h1>
+            <p>AUTHORIZATION GRANTED. PREPARE FOR TESTING.</p>
+            <button class="btn" onclick="goToVerse()" style="margin-top:20px">CHOOSE CHARACTER ➔</button>
+        </div>
+
+        <div id="page3" class="glass-panel hidden">
+            <h1>SPEED VERSE</h1>
+            <p>SELECT YOUR AVATAR</p>
+            <div class="char-grid" id="charGrid"></div>
+        </div>
+
+        <div id="instr1" class="glass-panel hidden">
+            <h1>STRENGTH TEST INSTRUCTIONS</h1>
+            <div style="text-align: left; margin: 20px 0; color: #ccc;">
+                <p>1. Ek Wall aayegi, usse break karna hai.</p>
+                <p>2. Jitni tez ho sake TAP karo.</p>
+                <p>3. Aapke taps se Strength bar decide hoga.</p>
+            </div>
+            <button class="btn" onclick="startCountdown(1)">CONTINUE</button>
+        </div>
+
+        <div id="pageTimer" class="glass-panel hidden">
+            <h1 id="timerHeading">GET READY</h1>
+            <div class="big-text" id="countdownNum">5</div>
+        </div>
+
+        <div id="gameWall" class="glass-panel hidden">
+            <h1 id="tapDisplay">TAPS: 0</h1>
+            <div class="wall-target" onclick="hitWall()">👊</div>
+            <div style="width:100%; height:10px; background:#222;"><div id="wall-timer-fill" style="width:100%; height:100%; background:var(--lookism-red);"></div></div>
+        </div>
+
+        <div id="instr2" class="glass-panel hidden">
+            <h1>SPEED TEST INSTRUCTIONS</h1>
+            <div style="text-align: left; margin: 20px 0; color: #ccc;">
+                <p>1. Jab screen RED ho aur "ATTACK" dikhe tabhi click karein.</p>
+                <p>2. 5 attacks dodge karne hain.</p>
+                <p>3. Agar 5 miss hue to game restart hoga.</p>
+            </div>
+            <button class="btn" onclick="startCountdown(2)">START SPEED TEST</button>
+        </div>
+
+        <div id="gameDodge" class="glass-panel hidden">
+            <h2 id="dodgeStats">DODGE: 0 | MISS: 0</h2>
+            <div id="dodge-box">
+                <div id="attack-flash"></div>
+                <div id="attack-text">⚠ ATTACK ⚠</div>
+                <div id="lose-screen" class="hidden"><h1 style="color:var(--lookism-red)">YOU LOSE!</h1></div>
+            </div>
+            <button class="btn" id="clickBtn" onclick="userClick()">DODGE NOW!</button>
+            <button class="btn hidden" id="restartBtn" onclick="startCountdown(2)">RESTART</button>
+        </div>
+
+        <div id="page4" class="hidden">
+            <div id="crew-id-card">
+                <div class="id-info">
+                    <p id="rankText" style="color:var(--lookism-red); font-weight:bold; font-size:1.2rem;"></p>
+                    <h2 id="finalName">NAME</h2>
+                    <div id="status-weak" style="color: var(--lookism-red); font-weight:900; font-size: 1.2rem; display:none;">TOO WEAK</div>
+                    <div class="power-container" id="finalBars">
+                        <div style="display:flex; justify-content:space-between; font-size:0.6rem"><span>STRENGTH</span><span id="sVal">0</span></div>
+                        <div class="bar-bg"><div id="sBar" class="bar-fill"></div></div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.6rem"><span>SPEED</span><span id="spVal">0</span></div>
+                        <div class="bar-bg"><div id="spBar" class="bar-fill"></div></div>
+                    </div>
+                    <div id="op-message">ME TOO OVERPOWERED</div>
+                </div>
+            </div>
+            <button class="btn" style="margin-top: 25px; width: 320px;" onclick="location.reload()">RE-TRY TEST</button>
+        </div>
+    </div>
+
+    <div class="credits-footer">This is a fan-made project. All characters, names, and images belong to PTJ Comics/Naver Webtoon. I do not own any of these assets</div>
+
+    <script>
+        let userName = "", selectedImg = "", taps = 0, dodges = 0, misses = 0, canDodge = false;
+        const characters = [
+            { name: "GUN PARK", img: "https://64.media.tumblr.com/6a041dd8190dc0cdbddc56c104b0dad2/c947bf24facb07a3-b2/s2048x3072/a6fe07e787afe38e3e7bb6c9cbfe2273021f57b5.jpg" },
+            { name: "JAMES LEE", img: "https://i.pinimg.com/736x/7b/84/f1/7b84f191a5702756a97d92cf303db7b6.jpg" },
+            { name: "KITAE KIM", img: "https://preview.redd.it/gitae-is-the-strongest-alive-character-right-now-v0-ge5zi6ej83td1.jpg?width=1080&crop=smart&auto=webp&s=324bd01d57c12a26feab040070f7a148fc3d5262" },
+            { name: "SEONGJI YUK", img: "https://i.pinimg.com/736x/66/82/9b/66829b18dcb563d4d6a55c1233b371a0.jpg" },
+            { name: "GOO KIM", img: "https://preview.redd.it/goo-kim-is-a-better-person-than-he-seems-to-be-v0-cjwucnwd4d2g1.png?width=1169&format=png&auto=webp&s=38ab8fb5768a5c34a3fca7e8a5ba174712bf9b3a" },
+            { name: "UI DANIEL", img: "https://i.redd.it/nkssa8r3eanc1.jpeg" }
+        ];
+
+        function goToWelcome() {
+            userName = document.getElementById('nameInput').value;
+            if(!userName.trim()) return alert("Enter Name!");
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('page2').classList.remove('hidden');
+            document.getElementById('welcomeTitle').innerText = "WELCOME, " + userName.toUpperCase();
+        }
+
+        function goToVerse() {
+            document.getElementById('page2').classList.add('hidden');
+            document.getElementById('page3').classList.remove('hidden');
+            const grid = document.getElementById('charGrid');
+            grid.innerHTML = '';
+            characters.forEach(char => {
+                const div = document.createElement('div');
+                div.className = 'char-card';
+                div.innerHTML = `<img src="${char.img}"><p>${char.name}</p>`;
+                div.onclick = () => { 
+                    selectedImg = char.img; 
+                    document.getElementById('page3').classList.add('hidden');
+                    document.getElementById('instr1').classList.remove('hidden');
+                };
+                grid.appendChild(div);
+            });
+        }
+
+        function startCountdown(gameNum) {
+            document.getElementById('instr1').classList.add('hidden');
+            document.getElementById('instr2').classList.add('hidden');
+            document.getElementById('gameDodge').classList.add('hidden');
+            document.getElementById('pageTimer').classList.remove('hidden');
+            let count = 5;
+            document.getElementById('countdownNum').innerText = count;
+            const timer = setInterval(() => {
+                count--;
+                document.getElementById('countdownNum').innerText = count;
+                if(count <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('pageTimer').classList.add('hidden');
+                    gameNum === 1 ? startStrength() : startDodge();
+                }
+            }, 1000);
+        }
+
+        function startStrength() {
+            document.getElementById('gameWall').classList.remove('hidden');
+            let timeLeft = 100;
+            const t = setInterval(() => {
+                timeLeft -= 2;
+                document.getElementById('wall-timer-fill').style.width = timeLeft + '%';
+                if(timeLeft <= 0) {
+                    clearInterval(t);
+                    document.getElementById('gameWall').classList.add('hidden');
+                    document.getElementById('instr2').classList.remove('hidden');
+                }
+            }, 100);
+        }
+        function hitWall() { taps++; document.getElementById('tapDisplay').innerText = "TAPS: " + taps; }
+
+        function startDodge() {
+            dodges = 0; misses = 0; canDodge = false;
+            document.getElementById('gameDodge').classList.remove('hidden');
+            document.getElementById('lose-screen').classList.add('hidden');
+            document.getElementById('clickBtn').classList.remove('hidden');
+            document.getElementById('restartBtn').classList.add('hidden');
+            updateDodgeUI();
+            nextAttack();
+        }
+
+        function nextAttack() {
+            if(dodges >= 5 || misses >= 5) return;
+            canDodge = false;
+            document.getElementById('attack-flash').style.display = 'none';
+            document.getElementById('attack-text').style.display = 'none';
+            
+            setTimeout(() => {
+                if(misses >= 5) return;
+                document.getElementById('attack-flash').style.display = 'block';
+                document.getElementById('attack-text').style.display = 'block';
+                canDodge = true;
+                
+                setTimeout(() => {
+                    if(canDodge) {
+                        canDodge = false;
+                        misses++;
+                        updateDodgeUI();
+                        if(misses < 5) nextAttack();
+                    }
+                }, 800);
+            }, 1000 + Math.random() * 2000);
+        }
+
+        function userClick() {
+            if(canDodge) {
+                dodges++;
+                canDodge = false;
+                updateDodgeUI();
+                if(dodges >= 5) finishGame(); else nextAttack();
+            } else {
+                misses++;
+                updateDodgeUI();
+            }
+        }
+
+        function updateDodgeUI() {
+            document.getElementById('dodgeStats').innerText = `DODGE: ${dodges} | MISS: ${misses}`;
+            if(misses >= 5) {
+                document.getElementById('lose-screen').classList.remove('hidden');
+                document.getElementById('clickBtn').classList.add('hidden');
+                document.getElementById('restartBtn').classList.remove('hidden');
+            }
+        }
+
+        function finishGame() {
+            document.getElementById('gameDodge').classList.add('hidden');
+            document.getElementById('page4').classList.remove('hidden');
+            document.getElementById('finalName').innerText = userName.toUpperCase();
+            document.getElementById('crew-id-card').style.backgroundImage = `url('${selectedImg}')`;
+            
+            const bars = document.getElementById('finalBars');
+            const weak = document.getElementById('status-weak');
+            const op = document.getElementById('op-message');
+            
+            if(taps < 10) {
+                bars.style.display = 'none'; weak.style.display = 'block';
+            } else {
+                let rank = "B";
+                if(misses === 0) rank = "SSS";
+                else if(misses === 1) rank = "SS";
+                else if(misses === 2) rank = "S";
+                else if(misses === 3) rank = "A";
+
+                document.getElementById('rankText').innerText = "RANK: " + rank;
+                
+                let s = (taps > 45) ? 100 : (taps > 35) ? 90 : (taps > 20) ? 70 : 50;
+                let sp = 100 - (misses * 20);
+
+                if(s === 100 && sp === 100) {
+                    setTimeout(() => {
+                        bars.style.display = 'none'; op.style.display = 'block';
+                        setTimeout(() => { op.style.display = 'none'; bars.style.display = 'block'; }, 3000);
+                    }, 2000);
+                }
+
+                setTimeout(() => {
+                    document.getElementById('sBar').style.width = s + '%';
+                    document.getElementById('spBar').style.width = sp + '%';
+                    document.getElementById('sVal').innerText = s + "%";
+                    document.getElementById('spVal').innerText = sp + "%";
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
